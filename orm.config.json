@@ -1,0 +1,14 @@
+{
+    "ssl": false,
+    "type": "mysql",
+    "host": "localhost",
+    "port": 3306,
+    "username": "root",
+    "password": "",
+    "database": "aquasistemas",
+    "entities": ["src/**/*.entity{.ts,.js}"],
+    "migrations": ["src/database/migrations/*{.ts,.js}"],
+    "cli": {
+        "migrationsDir": "src/database/migrations"
+    }
+}
