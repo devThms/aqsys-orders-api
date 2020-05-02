@@ -12,6 +12,7 @@ import { CustomerModule } from './catalogs/customer/customer.module';
 import { TechnicalModule } from './catalogs/technical/technical.module';
 import { OrderModule } from './transactions/order/order.module';
 import { OrderDetailsModule } from './transactions/order-details/order-details.module';
+import { AuthModule } from './admin/auth/auth.module';
 
 @Module({ 
     imports: [
@@ -23,7 +24,8 @@ import { OrderDetailsModule } from './transactions/order-details/order-details.m
         CustomerModule, 
         TechnicalModule, 
         OrderModule, 
-        OrderDetailsModule
+        OrderDetailsModule, 
+        AuthModule
     ], 
     controllers: [AppController], 
     providers: [AppService], 

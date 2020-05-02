@@ -1,4 +1,4 @@
-import { Controller, Res, Param, HttpStatus, Get, Post, Body, Put, Delete } from '@nestjs/common';
+import { Controller, Res, Param, HttpStatus, Get, Post, Body, Put, Delete, Type } from '@nestjs/common';
 import { ApiBody, ApiTags } from '@nestjs/swagger';
 
 import { UserService } from './user.service';
@@ -65,6 +65,13 @@ export class UserController {
             message: 'User successfully modified',
             userUpdated
         });
+
+    }
+
+    @Put(':id/assign-token')
+    async assignToken( @Param('id') id: string , @Body() token: string ): Promise<boolean> {
+
+        return await this._userService.assignToken(id, token);
 
     }
 

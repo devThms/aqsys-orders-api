@@ -115,4 +115,28 @@ export class UserService {
 
     }
 
+    async assignToken( id: string, token: string ): Promise<boolean> {
+
+        if (!id) {
+            throw new BadRequestException('the resource ID was not sent')
+        }
+
+        if (!token) {
+            throw new BadRequestException('the token device was not sent')
+        }
+
+        const userDb: User = await this._userRepository.findOne(id);
+
+        if (!userDb) {
+            throw new NotFoundException('The requested resource was not found')
+        }
+
+        userDb.deviceToken = token;
+
+        await userDb.save();
+
+        return true;
+
+    }
+
 }

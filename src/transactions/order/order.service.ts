@@ -1,5 +1,6 @@
 import { Injectable, BadRequestException, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
+import { Not } from 'typeorm';
 
 // Entities Models
 import { OrderRepository } from './order.repository';
@@ -30,7 +31,6 @@ export class OrderService {
         }
 
         const order: Order = await this._orderRepository.findOne( id, {
-            where: { status: Status.ACTIVE },
             relations: [
                 'user',
                 'customer', 'customer.bussinessPartner', 
@@ -49,7 +49,10 @@ export class OrderService {
     async getAll(): Promise<ReadOrderDTO[]> {
 
         const orders: Order[] = await this._orderRepository.find({
-            where: { status: Status.ACTIVE },
+            where: [
+                { status: Status.ACTIVE },
+                { status: Status.CONFIRMED }
+            ],
             relations: [
                 'user',
                 'customer', 'customer.bussinessPartner',
@@ -123,6 +126,90 @@ export class OrderService {
 
         return plainToClass(ReadOrderDTO, orderDeleted);
         
+    }
+
+    async confirm (id: string): Promise<ReadOrderDTO> {
+
+        if (!id) {
+            throw new BadRequestException('the resource ID was not sent')
+        }
+
+        const orderDb: Order = await this._orderRepository.findOne(id, {
+            where: { status: Status.ACTIVE },
+            relations: [
+                'user', 'user.role',
+                'customer', 'customer.bussinessPartner',
+                'technical', 'technical.bussinessPartner'
+            ]
+        });
+
+        if (!orderDb) {
+            throw new NotFoundException('The requested resource was not found')
+        }
+
+        await this._orderRepository.update(id, {
+            status: Status.CONFIRMED
+        });
+
+        const orderConfirmed = await this._orderRepository.findOne(id);
+
+        return plainToClass(ReadOrderDTO, orderConfirmed);
+    }
+
+    async approve ( id: string ): Promise<ReadOrderDTO> {
+
+        if (!id) {
+            throw new BadRequestException('the resource ID was not sent')
+        }
+
+        const orderDb: Order = await this._orderRepository.findOne(id, {
+            where: { status: Status.CONFIRMED },
+            relations: [
+                'user', 'user.role',
+                'customer', 'customer.bussinessPartner',
+                'technical', 'technical.bussinessPartner'
+            ]
+        });
+
+        if (!orderDb) {
+            throw new NotFoundException('The requested resource was not found')
+        }
+
+        await this._orderRepository.update(id, {
+            status: Status.APPROVED
+        });
+
+        const orderApproved = await this._orderRepository.findOne(id);
+
+        return plainToClass(ReadOrderDTO, orderApproved);
+    }
+
+    async reject (id: string): Promise<ReadOrderDTO> {
+
+        if (!id) {
+            throw new BadRequestException('the resource ID was not sent')
+        }
+
+        const orderDb: Order = await this._orderRepository.findOne(id, {
+            where: { status: Status.CONFIRMED },
+            relations: [
+                'user', 'user.role',
+                'customer', 'customer.bussinessPartner',
+                'technical', 'technical.bussinessPartner'
+            ]
+        });
+
+        if (!orderDb) {
+            throw new NotFoundException('The requested resource was not found')
+        }
+
+        await this._orderRepository.update(id, {
+            status: Status.REJECTED
+        });
+
+        const orderRejected = await this._orderRepository.findOne(id);
+
+        return plainToClass(ReadOrderDTO, orderRejected);
     }
 
 }
